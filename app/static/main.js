@@ -4,24 +4,33 @@ function setupDropzone() {
   const statusBox = document.getElementById("upload-status");
   if (!dropzone || !fileInput) return;
 
+  const t = (key, vars = {}) => {
+    const dict = window.I18N || {};
+    let value = dict[key] || key;
+    Object.entries(vars).forEach(([k, v]) => {
+      value = value.replace(`{${k}}`, v);
+    });
+    return value;
+  };
+
   const highlight = () => dropzone.classList.add("active");
   const unhighlight = () => dropzone.classList.remove("active");
 
   const handleFiles = (files) => {
     const validFiles = Array.from(files).filter((file) => file.type === "application/pdf");
     if (!validFiles.length) {
-      statusBox.textContent = "Dodaj PDF.";
+      statusBox.textContent = "PDF only.";
       return;
     }
     validFiles.forEach(async (file) => {
-      statusBox.textContent = `Wysyłanie ${file.name}...`;
+      statusBox.textContent = t("uploading", { filename: file.name });
       const formData = new FormData();
       formData.append("file", file);
       try {
         const res = await fetch("/api/upload", { method: "POST", body: formData });
         if (!res.ok) throw new Error("Błąd wysyłki");
         const job = await res.json();
-        statusBox.textContent = `Zadanie #${job.id} (${job.filename}) status: ${job.status}`;
+        statusBox.textContent = t("status", { id: job.id, filename: job.filename, status: job.status });
         refreshJobs();
       } catch (err) {
         statusBox.textContent = err.message;
@@ -50,13 +59,14 @@ function setupDropzone() {
 async function refreshJobs() {
   const list = document.getElementById("jobs-list");
   if (!list) return;
-  list.innerHTML = "Ładowanie...";
+  const dict = window.I18N || {};
+  list.innerHTML = dict.loading || "Loading...";
   try {
     const res = await fetch("/api/jobs?limit=5");
     if (!res.ok) throw new Error("Nie udało się pobrać zadań");
     const jobs = await res.json();
     if (!jobs.length) {
-      list.textContent = "Brak zadań.";
+      list.textContent = dict.jobs_empty || "No jobs.";
       return;
     }
     list.innerHTML = "";

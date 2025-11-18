@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="card">
-  <h2>Przeciągnij i upuść pliki PDF</h2>
-  <p>Pliki zostaną automatycznie przesłane i wysłane do druku.</p>
+  <h2>{{ t.drop_title }}</h2>
+  <p>{{ t.drop_sub }}</p>
   <div id="dropzone" class="dropzone">
-    Upuść pliki PDF tutaj lub kliknij, aby wybrać.
+    {{ t.drop_hint }}
     <input id="file-input" type="file" accept="application/pdf" multiple hidden>
   </div>
   <div id="upload-status" class="status"></div>
 </section>
 <section class="card">
-  <h3>Ostatnie zadania</h3>
+  <h3>{{ t.recent_jobs }}</h3>
   <ul id="jobs-list"></ul>
 </section>
 {% endblock %}

@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import uuid
@@ -26,6 +27,56 @@ app = FastAPI(title="Drop2Print", version="0.1.0")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 printer_service = PrinterService(printer_name=os.getenv("DROP2PRINT_PRINTER"))
+
+TRANSLATIONS = {
+    "en": {
+        "title": "Drop2Print",
+        "nav_user": "User panel",
+        "nav_admin": "Admin",
+        "drop_title": "Drop PDF files here",
+        "drop_sub": "Files will be uploaded and sent to print automatically.",
+        "drop_hint": "Drop PDF files here or click to choose.",
+        "recent_jobs": "Recent jobs",
+        "uploading": "Uploading {filename}...",
+        "status": "Job #{id} ({filename}) status: {status}",
+        "jobs_empty": "No jobs.",
+        "loading": "Loading...",
+        "settings": "Settings",
+        "copies_label": "Number of copies per job",
+        "save": "Save",
+        "save_success": "Saved.",
+        "save_error": "Save error",
+        "stats": "Statistics",
+        "total_jobs": "Total jobs",
+        "printed": "Printed",
+    },
+    "pl": {
+        "title": "Drop2Print",
+        "nav_user": "Panel użytkownika",
+        "nav_admin": "Administracja",
+        "drop_title": "Przeciągnij pliki PDF",
+        "drop_sub": "Pliki zostaną automatycznie wysłane do druku.",
+        "drop_hint": "Upuść pliki PDF tutaj lub kliknij, aby wybrać.",
+        "recent_jobs": "Ostatnie zadania",
+        "uploading": "Wysyłanie {filename}...",
+        "status": "Zadanie #{id} ({filename}) status: {status}",
+        "jobs_empty": "Brak zadań.",
+        "loading": "Ładowanie...",
+        "settings": "Ustawienia",
+        "copies_label": "Liczba kopii na zadanie",
+        "save": "Zapisz",
+        "save_success": "Zapisano.",
+        "save_error": "Błąd zapisu",
+        "stats": "Statystyki",
+        "total_jobs": "Zadań łącznie",
+        "printed": "Wydrukowane",
+    },
+}
+
+
+def get_lang(request: Request) -> str:
+    lang = request.query_params.get("lang") or request.cookies.get("lang") or "en"
+    return lang if lang in TRANSLATIONS else "en"
 
 
 @app.on_event("startup")
@@ -71,11 +122,20 @@ def serialize_job(job: PrintJob) -> dict:
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    lang = get_lang(request)
+    t = TRANSLATIONS[lang]
+    response = templates.TemplateResponse(
+        "index.html",
+        {"request": request, "t": t, "lang": lang, "translations_json": json.dumps(t)},
+    )
+    response.set_cookie("lang", lang)
+    return response
 
 
 @app.get("/admin", response_class=HTMLResponse)
 def admin_panel(request: Request, session: Session = Depends(get_session)):
+    lang = get_lang(request)
+    t = TRANSLATIONS[lang]
     copies = int(get_setting(session, "copies", str(Setting.default_copies())).value)
     recent_jobs: List[PrintJob] = session.exec(
         select(PrintJob).order_by(PrintJob.created_at.desc()).limit(10)
@@ -85,15 +145,20 @@ def admin_panel(request: Request, session: Session = Depends(get_session)):
         select(func.count()).select_from(PrintJob).where(PrintJob.status == PrintStatus.printed)
     ).one()
     stats = {"total_jobs": total_jobs, "printed": printed_jobs}
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         "admin.html",
         {
             "request": request,
             "copies": copies,
             "recent_jobs": recent_jobs,
             "stats": stats,
+            "t": t,
+            "lang": lang,
+            "translations_json": json.dumps(t),
         },
     )
+    response.set_cookie("lang", lang)
+    return response
 
 
 @app.get("/api/settings")

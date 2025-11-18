@@ -2,22 +2,28 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Drop2Print</title>
+  <title>{{ t.title }}</title>
   <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
   <header>
     <div class="container">
-      <h1><a href="/">Drop2Print</a></h1>
+      <h1><a href="/">{{ t.title }}</a></h1>
       <nav>
-        <a href="/">Panel użytkownika</a>
-        <a href="/admin">Administracja</a>
+        <a href="/?lang={{ lang }}">{{ t.nav_user }}</a>
+        <a href="/admin?lang={{ lang }}">{{ t.nav_admin }}</a>
+        <span class="lang-switch">
+          <a href="?lang=pl">PL</a> | <a href="?lang=en">EN</a>
+        </span>
       </nav>
     </div>
   </header>
   <main class="container">
     {% block content %}{% endblock %}
   </main>
+  <script>
+    window.I18N = {{ translations_json | safe }};
+  </script>
   <script src="/static/main.js" defer></script>
   {% block scripts %}{% endblock %}
 </body>

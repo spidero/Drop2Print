@@ -1,40 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="card">
-  <h2>Ustawienia</h2>
+  <h2>{{ t.settings }}</h2>
   <form id="settings-form" class="grid">
-    <label>Liczba kopii na zadanie
+    <label>{{ t.copies_label }}
       <input type="number" name="copies" id="copies-input" min="1" value="{{ copies }}">
     </label>
-    <button type="submit">Zapisz</button>
+    <button type="submit">{{ t.save }}</button>
   </form>
   <div id="settings-status" class="status"></div>
 </section>
 
 <section class="card">
-  <h2>Statystyki</h2>
+  <h2>{{ t.stats }}</h2>
   <div class="stats">
     <div class="stat">
       <div class="stat-value">{{ stats.total_jobs }}</div>
-      <div class="stat-label">Zadań łącznie</div>
+      <div class="stat-label">{{ t.total_jobs }}</div>
     </div>
     <div class="stat">
       <div class="stat-value">{{ stats.printed }}</div>
-      <div class="stat-label">Wydrukowane</div>
+      <div class="stat-label">{{ t.printed }}</div>
     </div>
   </div>
 </section>
 
 <section class="card">
-  <h2>Ostatnie zadania</h2>
+  <h2>{{ t.recent_jobs }}</h2>
   <table class="jobs-table">
     <thead>
       <tr>
         <th>ID</th>
-        <th>Plik</th>
+        <th>File</th>
         <th>Status</th>
-        <th>Kopie</th>
-        <th>Utworzono</th>
+        <th>Copies</th>
+        <th>Created</th>
       </tr>
     </thead>
     <tbody>
@@ -47,7 +47,7 @@
         <td>{{ job.created_at }}</td>
       </tr>
     {% else %}
-      <tr><td colspan="5">Brak zadań</td></tr>
+      <tr><td colspan="5">{{ t.jobs_empty }}</td></tr>
     {% endfor %}
     </tbody>
   </table>
@@ -60,12 +60,12 @@
     const statusEl = document.getElementById("settings-status");
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      statusEl.textContent = "Zapisywanie...";
+      statusEl.textContent = window.I18N.save || "Save";
       const formData = new FormData(form);
       try {
         const res = await fetch("/api/settings", { method: "POST", body: formData });
-        if (!res.ok) throw new Error("Błąd zapisu");
-        statusEl.textContent = "Zapisano.";
+        if (!res.ok) throw new Error(window.I18N.save_error || "Save error");
+        statusEl.textContent = window.I18N.save_success || "Saved.";
       } catch (err) {
         statusEl.textContent = err.message;
       }
