@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t drop2print-ci .
+
+      - name: Run container
+        run: docker run -d -p 8000:8000 --name drop2print-ci drop2print-ci
+
+      - name: Wait for app
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:8000/ >/dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "App did not become ready in time" >&2
+          exit 1
+
+      - name: Hit /
+        run: curl -f http://localhost:8000/
+
+      - name: Hit /admin
+        run: curl -f http://localhost:8000/admin
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f drop2print-ci || true
