@@ -23,7 +23,7 @@ class PrintJob(SQLModel, table=True):
 
 
 class Setting(SQLModel, table=True):
-    key: str = Field(primary_key=True, sa_column=Column("key", String, unique=True))
+    key: str = Field(sa_column=Column("key", String, primary_key=True, unique=True))
     value: str
 
     @staticmethod

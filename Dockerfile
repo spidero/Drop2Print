@@ -6,7 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Force reinstall to avoid cached wheels with incompatible versions
+RUN pip install --no-cache-dir --upgrade --force-reinstall -r requirements.txt
 
 COPY app ./app
 

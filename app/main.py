@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import List
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
@@ -69,21 +69,21 @@ def serialize_job(job: PrintJob) -> dict:
     }
 
 
-@app.get("/")
-def index(request: Request) -> Jinja2Templates.TemplateResponse:
+@app.get("/", response_class=HTMLResponse)
+def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.get("/admin")
-def admin_panel(request: Request, session: Session = Depends(get_session)) -> Jinja2Templates.TemplateResponse:
+@app.get("/admin", response_class=HTMLResponse)
+def admin_panel(request: Request, session: Session = Depends(get_session)):
     copies = int(get_setting(session, "copies", str(Setting.default_copies())).value)
     recent_jobs: List[PrintJob] = session.exec(
         select(PrintJob).order_by(PrintJob.created_at.desc()).limit(10)
     ).all()
-    total_jobs = session.exec(select(func.count()).select_from(PrintJob)).one()[0]
-    printed_jobs = (
-        session.exec(select(func.count()).select_from(PrintJob).where(PrintJob.status == PrintStatus.printed)).one()[0]
-    )
+    total_jobs = session.exec(select(func.count()).select_from(PrintJob)).one()
+    printed_jobs = session.exec(
+        select(func.count()).select_from(PrintJob).where(PrintJob.status == PrintStatus.printed)
+    ).one()
     stats = {"total_jobs": total_jobs, "printed": printed_jobs}
     return templates.TemplateResponse(
         "admin.html",

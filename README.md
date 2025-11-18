@@ -28,7 +28,7 @@ docker run -p 8000:8000 -v $(pwd)/app/uploads:/app/app/uploads drop2print
 ```bash
 docker compose up --build
 ```
-The service listens on port `8000`. By default, it mounts `app/uploads` and `app/db` from the host, so jobs and the database persist between restarts. Set `DROP2PRINT_PRINTER` in `docker-compose.yml` or at runtime if you need a specific printer.
+The service listens on port `8000`. By default, it mounts `app/uploads` and `app/db` from the host, so jobs and the database persist between restarts. Set `DROP2PRINT_PRINTER` via env (uncomment in `docker-compose.yml`) or at runtime if you need a specific printer.
 
 ## Configuration
 - `DROP2PRINT_DB_PATH` – path to the SQLite file (default `app/db/drop2print.sqlite3`).
