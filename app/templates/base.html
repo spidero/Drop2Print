@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Drop2Print</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1><a href="/">Drop2Print</a></h1>
+      <nav>
+        <a href="/">Panel użytkownika</a>
+        <a href="/admin">Administracja</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+  <script src="/static/main.js" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

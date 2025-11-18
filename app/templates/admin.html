@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>Ustawienia</h2>
+  <form id="settings-form" class="grid">
+    <label>Liczba kopii na zadanie
+      <input type="number" name="copies" id="copies-input" min="1" value="{{ copies }}">
+    </label>
+    <button type="submit">Zapisz</button>
+  </form>
+  <div id="settings-status" class="status"></div>
+</section>
+
+<section class="card">
+  <h2>Statystyki</h2>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value">{{ stats.total_jobs }}</div>
+      <div class="stat-label">Zadań łącznie</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">{{ stats.printed }}</div>
+      <div class="stat-label">Wydrukowane</div>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Ostatnie zadania</h2>
+  <table class="jobs-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Plik</th>
+        <th>Status</th>
+        <th>Kopie</th>
+        <th>Utworzono</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for job in recent_jobs %}
+      <tr>
+        <td>{{ job.id }}</td>
+        <td>{{ job.filename }}</td>
+        <td>{{ job.status }}</td>
+        <td>{{ job.copies }}</td>
+        <td>{{ job.created_at }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">Brak zadań</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("settings-form");
+    const statusEl = document.getElementById("settings-status");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusEl.textContent = "Zapisywanie...";
+      const formData = new FormData(form);
+      try {
+        const res = await fetch("/api/settings", { method: "POST", body: formData });
+        if (!res.ok) throw new Error("Błąd zapisu");
+        statusEl.textContent = "Zapisano.";
+      } catch (err) {
+        statusEl.textContent = err.message;
+      }
+    });
+  });
+</script>
+{% endblock %}

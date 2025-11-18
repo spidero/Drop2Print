@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: drop2print
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app/uploads:/app/app/uploads
+      - ./app/db:/app/app/db
+    environment:
+      # Ustaw, jeśli chcesz wymusić konkretną drukarkę dla `lp`
+      DROP2PRINT_PRINTER: my_printer
+    restart: unless-stopped
