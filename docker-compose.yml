@@ -7,10 +7,18 @@ services:
     volumes:
       - ./app/uploads:/app/app/uploads
       - ./app/db:/app/app/db
-      # - /path/to/samba/share:/incoming
     environment:
       DROP2PRINT_ADMIN_PASSWORD: ${DROP2PRINT_ADMIN_PASSWORD:-changeme}
-      # DROP2PRINT_WATCH_PATH: /incoming
-      # DROP2PRINT_WATCH_INTERVAL: "5"
+      DROP2PRINT_WATCH_PATH: /incoming
+      DROP2PRINT_WATCH_INTERVAL: "5"
       # DROP2PRINT_PRINTER: my_printer
     restart: unless-stopped
+
+volumes:
+  # Example CIFS volume handled entirely by Docker:
+  # samba-share:
+  #   driver: local
+  #   driver_opts:
+  #     type: cifs
+  #     o: username=${SAMBA_USER},password=${SAMBA_PASS},vers=3.0
+  #     device: //SERVER/SHARE
