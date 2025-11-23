@@ -149,6 +149,7 @@ async def upload_pdf(file: UploadFile = File(...), session: Session = Depends(ge
     session.refresh(job)
 
     try:
+        logger.info("Printing job %s (%s) with %s copies from %s", job.id, job.filename, job.copies, job.storage_path)
         printer_service.print_file(job)
         job.status = PrintStatus.printed
         job.printed_at = datetime.utcnow()
@@ -161,5 +162,10 @@ async def upload_pdf(file: UploadFile = File(...), session: Session = Depends(ge
     session.add(job)
     session.commit()
     session.refresh(job)
+
+    if job.status == PrintStatus.failed:
+        logger.error("Job %s failed: %s", job.id, job.error)
+    else:
+        logger.info("Job %s finished with status %s", job.id, job.status)
 
     return JSONResponse(content=serialize_job(job))

@@ -1,7 +1,6 @@
 import logging
-from typing import Optional
-
 import subprocess
+from typing import Optional
 
 from app.models import PrintJob
 
@@ -25,10 +24,11 @@ class PrinterService:
             cmd.extend(["-d", self.printer_name])
 
         try:
+            logger.info("Running command: %s", " ".join(cmd))
             subprocess.run(cmd, check=True)
-            logger.info("Sent job %s to printer %s", job.id, self.printer_name or "<default>")
         except FileNotFoundError:
             logger.warning("`lp` command not found; skipping real print for job %s", job.id)
+            raise
         except subprocess.CalledProcessError as exc:
             logger.error("Printing failed for job %s: %s", job.id, exc)
             raise
