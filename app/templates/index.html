@@ -13,6 +13,23 @@
   <h3>{{ t.recent_jobs }}</h3>
   <ul id="jobs-list"></ul>
 </section>
+<section class="card system-info">
+  <h3>{{ t.system_info }}</h3>
+  <p>{{ t.watch_path_label }}:
+    {% if watch_path %}
+      <span class="mono">{{ watch_path }}</span>
+    {% else %}
+      {{ t.watch_disabled }}
+    {% endif %}
+  </p>
+  <p>{{ t.printer_label }}:
+    {% if printer_name %}
+      <span class="mono">{{ printer_name }}</span>
+    {% else %}
+      {{ t.printer_default }}
+    {% endif %}
+  </p>
+</section>
 {% endblock %}
 {% block scripts %}
 <script>

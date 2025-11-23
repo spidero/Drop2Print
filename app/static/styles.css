@@ -9,6 +9,7 @@ header nav a { margin-left: 16px; color: #c7d2fe; font-weight: 600; }
 .dropzone { border: 2px dashed #93c5fd; border-radius: 8px; padding: 48px; text-align: center; cursor: pointer; background: #f0f9ff; transition: border-color .2s; }
 .dropzone.active { border-color: #2563eb; }
 .status { margin-top: 12px; color: #2563eb; font-weight: 600; }
+.status.error { color: #dc2626; }
 .jobs-table { width: 100%; border-collapse: collapse; }
 .jobs-table th, .jobs-table td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; }
 .jobs-table th { background: #f3f4f6; }
@@ -21,3 +22,5 @@ button:hover { background: #1d4ed8; }
 .stat { background: #f3f4f6; border-radius: 8px; padding: 12px; flex: 1; text-align: center; }
 .stat-value { font-size: 24px; font-weight: 800; }
 .stat-label { color: #4b5563; }
+.system-info p { margin: 6px 0; }
+.mono { font-family: "Fira Code", "Courier New", monospace; }

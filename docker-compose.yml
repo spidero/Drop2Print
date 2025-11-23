@@ -7,8 +7,10 @@ services:
     volumes:
       - ./app/uploads:/app/app/uploads
       - ./app/db:/app/app/db
-    environment: {}
-    # Uncomment to force a specific printer for `lp`
-    # environment:
-    #   DROP2PRINT_PRINTER: my_printer
+      # - /path/to/samba/share:/incoming
+    environment:
+      DROP2PRINT_ADMIN_PASSWORD: ${DROP2PRINT_ADMIN_PASSWORD:-changeme}
+      # DROP2PRINT_WATCH_PATH: /incoming
+      # DROP2PRINT_WATCH_INTERVAL: "5"
+      # DROP2PRINT_PRINTER: my_printer
     restart: unless-stopped
